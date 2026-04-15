@@ -1,0 +1,54 @@
+version: '3.7'
+services:
+  app:
+    container_name: ${APP_NAME}_app
+    build:
+      context: ./
+      dockerfile: ./app.Dockerfile
+    volumes:
+      - ./app:/app
+      - ./shared/models:/app/models/shared
+      - ./shared/schemas:/app/schemas/shared
+      - ./shared/services:/app/services/shared
+      - ./shared/config:/app/config
+      - ./shared/public/storage:/app/public/storage
+    depends_on:
+      - selenium
+    command: sh ./app-boot.sh
+    env_file:
+      - .env
+    ports:
+      - $APP_PORT:$APP_PORT
+    networks:
+      - app-network
+
+  browsermob-proxy:
+    build:
+      context: .
+      dockerfile: bmp.Dockerfile
+    container_name:  ${APP_NAME}_browsermobproxy
+    ports:
+      - $BMP_PORT:$BMP_PORT
+      - $BMP_PORT_RANGE:$BMP_PORT_RANGE
+
+  selenium:
+    image: selenium/standalone-chromium:latest
+    container_name: ${APP_NAME}_selenium
+    restart: unless-stopped
+    shm_size: 2g
+    volumes:
+      - ./shared/public/storage:/app/public/storage
+    ports:
+      - $SELENIUM_PORT:$SELENIUM_PORT
+      - $VNC_VIEWER_PORT:$VNC_VIEWER_PORT
+    env_file:
+      - .env
+    networks:
+      - app-network
+
+volumes:
+  static_volume:
+
+networks:
+  app-network:
+    driver: bridge
