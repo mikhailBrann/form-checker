@@ -17,7 +17,7 @@ app = FastAPI()
 
 if __name__ == "__main__":
     parser = ParserService()
-    result = parser.parse_page_screenshot("https://site.ru/tula", "site_parse")
+    result = parser.parse_page_screenshot("https://site.ru/tula", "site_shoot_name")
     print(result)
     
     # uvicorn.run(app, host="0.0.0.0", port=APP_CONFIG["APP_PORT"])

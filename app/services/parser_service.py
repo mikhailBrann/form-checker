@@ -25,7 +25,7 @@ class ParserService:
                 f"{filename}_before.png"
             )
 
-            form = self.send_form(
+            form = self.complete_form(
                 ".resume-form form",
                 {
                     "name": {
@@ -54,7 +54,14 @@ class ParserService:
 
             self.make_shot(
                 url,
-                f"{filename}_after.png"
+                f"{filename}_complete.png"
+            )
+
+            self._submit_form(form, 13)
+
+            self.make_shot(
+                url,
+                f"{filename}_submit.png"
             )
 
             return form
@@ -96,7 +103,7 @@ class ParserService:
         except Exception as e:
             return e
 
-    def send_form(self, parent_selector: str, fields: dict):
+    def complete_form(self, parent_selector: str, fields: dict):
         form = self.selenium.driver.find_element(
             self.selenium.by.CSS_SELECTOR,
             parent_selector
@@ -108,68 +115,50 @@ class ParserService:
             value_elem_selector = fields[field].get("value_elem")
             
             self._complete_field_form(
+                form,
                 field_value,
                 field_type,
-                value_elem_selector
+                value_elem_selector,
+                field
             )
 
         time.sleep(0.1)
-        result = self._submit_form(form)
 
-        return result
+        return form
     
-    def _submit_form(self, form):
+    def _submit_form(self, form, respTime=60):
         requests = []
+
         
-        self.selenium.driver.execute_cdp_cmd("Network.enable", {})
-        self.selenium.driver.execute_cdp_cmd(
-            "Network.setRequestInterception",
-            {
-                "patterns": [{"urlPattern": "*", "resourceType": "XHR", "interceptionStage": "HeadersReceived"}]
-            }
-        )
+        # self.selenium.driver.execute_cdp_cmd("Network.enable", {})
+        # self.selenium.driver.execute_cdp_cmd(
+        #     "Network.setRequestInterception",
+        #     {
+        #         "patterns": [{"urlPattern": "*", "resourceType": "XHR", "interceptionStage": "HeadersReceived"}]
+        #     }
+        # )
         
         form.submit()
+        time.sleep(respTime)
+                    
 
-        time.sleep(5)
-        
-        logs = self.selenium.driver.get_log("performance")
-
-        import json
-
-        for entry in logs:
-            message = json.loads(entry["message"])["message"]
-            if (
-                "Network.requestWillBeSent" == message.get("method")
-                or "Network.responseReceived" == message.get("method")
-            ):
-                requests.append(message)
-
-        # Отключаем Network мониторинг
-        self.selenium.driver.execute_cdp_cmd("Network.disable", {})
-        
-        return requests
-
-
-
-        
 
     def _complete_field_form(
         self, 
         form, 
         field_value="",
         field_type="",
-        value_elem_selector=""
+        value_elem_selector="",
+        field=""
     ):
         if field_type == "click_select_by_selector":
             field_elem = form.find_element(
                 self.selenium.by.CSS_SELECTOR,
                 f".{field}"
             )
-            value_elem_selector = fields[field]['value_elem']
             elems = form.find_elements(
                 self.selenium.by.CSS_SELECTOR,
-                f"{value_elem_selector}"
+                value_elem_selector
             )
 
             field_elem.click()

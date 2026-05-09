@@ -4,7 +4,7 @@ FROM eclipse-temurin:8-jre-focal
 RUN apt-get update && apt-get install -y wget unzip && rm -rf /var/lib/apt/lists/*
 
 # Скачиваем BMP (одной строкой с полной ссылкой)
-RUN wget https://github.com \
+RUN wget https://github.com/lightbody/browsermob-proxy/releases/download/browsermob-proxy-2.1.4/browsermob-proxy-2.1.4-bin.zip \
     && unzip browsermob-proxy-2.1.4-bin.zip \
     && rm browsermob-proxy-2.1.4-bin.zip
 
