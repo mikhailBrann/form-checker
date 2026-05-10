@@ -127,19 +127,15 @@ class ParserService:
         return form
     
     def _submit_form(self, form, respTime=60):
-        requests = []
-
-        
-        # self.selenium.driver.execute_cdp_cmd("Network.enable", {})
-        # self.selenium.driver.execute_cdp_cmd(
-        #     "Network.setRequestInterception",
-        #     {
-        #         "patterns": [{"urlPattern": "*", "resourceType": "XHR", "interceptionStage": "HeadersReceived"}]
-        #     }
-        # )
+        self.selenium.bmp_service.start_har("form_submit")
         
         form.submit()
         time.sleep(respTime)
+
+        # Получаем HAR с запросами и ответами
+        har_data = self.browsermob_proxy_service.get_har()
+
+        print(har_data)
                     
 
 

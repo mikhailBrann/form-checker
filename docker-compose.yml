@@ -22,7 +22,7 @@ services:
     networks:
       - app-network
 
-  browsermob-proxy:
+  browsermobproxy:
     build:
       context: .
       dockerfile: bmp.Dockerfile
@@ -30,6 +30,10 @@ services:
     ports:
       - $BMP_PORT:$BMP_PORT
       - $BMP_PORT_RANGE:$BMP_PORT_RANGE
+    env_file:
+      - .env
+    networks:
+      - app-network
 
   selenium:
     image: selenium/standalone-chromium:latest

@@ -12,4 +12,4 @@ WORKDIR /browsermob-proxy-2.1.4/bin
 
 # Используем JSON-формат для CMD. 
 # Чтобы использовать переменные окружения, вызываем через sh
-CMD ["sh", "-c", "./browsermob-proxy -port ${API_PORT} -proxyPortRange ${PROXY_RANGE}"]
+CMD ["sh", "-c", "./browsermob-proxy --address 0.0.0.0 -port ${API_PORT} -proxyPortRange ${PROXY_RANGE}"]
